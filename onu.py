@@ -49,7 +49,9 @@ def find_received_value():
 
 def send_to_line( _message ):
 	url = "https://notify-api.line.me/api/notify"
-	access_token = 'mpazGmQCgxB4JSJJzU1LdUgvQmGTP7SVTU1P42L2Xib'
+	file = open( '.access_token', 'r' )
+	access_token = file.readline().strip()
+	file.close
 	headers = {'Authorization': 'Bearer ' + access_token}
 	message = _message
 	payload = {'message': message}
@@ -58,7 +60,8 @@ def send_to_line( _message ):
 browser = init_browser()
 access_onu()
 
-MIN_DBM = -21.60
+#MIN_DBM = -21.60
+MIN_DBM = -17.60
 MAX_ALERT = 100
 INTERVAL = 60
 MAX_COUNT = 1440
