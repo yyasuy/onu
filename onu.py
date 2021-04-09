@@ -60,8 +60,7 @@ def send_to_line( _message ):
 browser = init_browser()
 access_onu()
 
-#MIN_DBM = -21.60
-MIN_DBM = -17.60
+MIN_DBM = -20.50
 MAX_ALERT = 100
 INTERVAL = 60
 MAX_COUNT = 1440
