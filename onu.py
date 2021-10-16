@@ -1,5 +1,6 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.options import Options as Chrome_Options
+from selenium.webdriver.chrome import service as Chrome_Service
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -13,16 +14,20 @@ from pprint import pprint
 import time
 import requests
 
-chrome_options = Options()
+
+DRIVER_PATH = '/opt/homebrew/bin/chromedriver'
+chrome_service = Chrome_Service.Service( DRIVER_PATH )
+
+chrome_options = Chrome_Options()
 chrome_options.add_argument('--disable-gpu')
 chrome_options.add_argument('--disable-extensions')
 chrome_options.add_argument('--proxy-server="direct://"')
 chrome_options.add_argument('--proxy-bypass-list=*')
 chrome_options.add_argument('--start-maximized')
 
+
 def init_browser():
-	DRIVER_PATH = '/usr/local/bin/chromedriver'
-	browser = webdriver.Chrome(executable_path=DRIVER_PATH, options = chrome_options)
+	browser = webdriver.Chrome( service = chrome_service, options = chrome_options )
 	url = 'http://192.168.1.1'
 	browser.get( url )
 	browser.implicitly_wait(5)
@@ -32,19 +37,19 @@ def access_onu():
 	file = open( '.password', 'r' )
 	password = file.readline().strip()
 	file.close()
-	el = browser.find_element_by_css_selector( '#txt_Username' )
+	el = browser.find_element( By.CSS_SELECTOR, '#txt_Username' )
 	el.send_keys( 'admin' )
-	el = browser.find_element_by_css_selector( '#txt_Password' )
+	el = browser.find_element( By.CSS_SELECTOR, '#txt_Password' )
 	el.send_keys( password )
-	el = browser.find_element_by_css_selector( '#button' )
+	el = browser.find_element( By.CSS_SELECTOR, '#button' )
 	el.click()
 
 def find_received_value():
-	el = browser.find_element_by_css_selector( '#nav > ul > li:nth-child(5) > div' )
+	el = browser.find_element( By.CSS_SELECTOR, '#nav > ul > li:nth-child(5) > div' )
 	el.click()
-	iframe = browser.find_element_by_css_selector( '#frameContent' )
+	iframe = browser.find_element( By.CSS_SELECTOR, '#frameContent' )
 	browser.switch_to.frame( iframe )
-	el = browser.find_element_by_css_selector( '#optic_status_table > tbody > tr:nth-child(4) > td:nth-child(2)' )
+	el = browser.find_element( By.CSS_SELECTOR, '#optic_status_table > tbody > tr:nth-child(4) > td:nth-child(2)' )
 	return el.text
 
 def send_to_line( _message ):
