@@ -110,3 +110,4 @@ while count < MAX_COUNT:
 	count += 1
 
 browser.close()
+
