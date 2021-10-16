@@ -17,14 +17,12 @@ import requests
 
 DRIVER_PATH = '/opt/homebrew/bin/chromedriver'
 chrome_service = Chrome_Service.Service( DRIVER_PATH )
-
 chrome_options = Chrome_Options()
 chrome_options.add_argument('--disable-gpu')
 chrome_options.add_argument('--disable-extensions')
 chrome_options.add_argument('--proxy-server="direct://"')
 chrome_options.add_argument('--proxy-bypass-list=*')
 chrome_options.add_argument('--start-maximized')
-
 
 def init_browser():
 	browser = webdriver.Chrome( service = chrome_service, options = chrome_options )
