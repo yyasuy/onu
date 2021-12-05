@@ -12,10 +12,11 @@ import datetime
 import re
 from pprint import pprint
 import time
+import subprocess
 import requests
 
-
-DRIVER_PATH = '/opt/homebrew/bin/chromedriver'
+#DRIVER_PATH = '/opt/homebrew/bin/chromedriver'
+DRIVER_PATH = '/usr/local/bin/chromedriver'
 chrome_service = Chrome_Service.Service( DRIVER_PATH )
 chrome_options = Chrome_Options()
 chrome_options.add_argument('--disable-gpu')
@@ -50,6 +51,19 @@ def find_received_value():
 	el = browser.find_element( By.CSS_SELECTOR, '#optic_status_table > tbody > tr:nth-child(4) > td:nth-child(2)' )
 	return el.text
 
+def is_connected_to_internet():
+	result = subprocess.run( [ "ping", "ping-toyama.sinet.ad.jp", "-c", "1", "-W", "300" ], stdout=subprocess.PIPE)
+	if result.returncode == 0:
+		return True
+	else:
+		return False
+
+def log( _message ):
+	file = open( 'error.log', 'a')
+	dt_now = datetime.datetime.now()
+	file.write( dt_now.strftime('%Y/%m/%d %H:%M:%S') + " " + _message + "\n" )
+	file.close()
+
 def send_to_line( _message ):
 	url = "https://notify-api.line.me/api/notify"
 	file = open( '.access_token', 'r' )
@@ -58,15 +72,16 @@ def send_to_line( _message ):
 	headers = {'Authorization': 'Bearer ' + access_token}
 	message = _message
 	payload = {'message': message}
-	r = requests.post(url, headers=headers, params=payload,)
+	if is_connected_to_internet() == True:
+		r = requests.post(url, headers=headers, params=payload,)
 
 browser = init_browser()
 access_onu()
 
-MIN_DBM = -20.50
+MIN_DBM = -22.00
 MAX_ALERT = 100
 INTERVAL = 60
-MAX_COUNT = 1440
+MAX_COUNT = 10080 # 1 week
 count = 0
 alert = 0
 while count < MAX_COUNT:
@@ -89,12 +104,14 @@ while count < MAX_COUNT:
 
 	if( '--' in text_value ):
 		try:
+			log( text )
 			send_to_line( text )
 			alert += 1
 		except:
 			continue
 	elif ( float( text_value ) < MIN_DBM ):
 		try:
+			log( text )
 			send_to_line( text )
 			alert += 1
 		except:
