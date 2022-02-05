@@ -79,11 +79,12 @@ browser = init_browser()
 access_onu()
 
 MIN_DBM = -22.00
-MAX_ALERT = 100
+MAX_ALERT = 180
 INTERVAL = 60
 MAX_COUNT = 10080 # 1 week
 count = 0
 alert = 0
+internet_connection = True
 while count < MAX_COUNT:
 	try:
 		text = find_received_value()
@@ -103,6 +104,7 @@ while count < MAX_COUNT:
 	text_value = match.group( 0 )
 
 	if( '--' in text_value ):
+		internet_connection = False
 		try:
 			log( text )
 			send_to_line( text )
@@ -110,6 +112,7 @@ while count < MAX_COUNT:
 		except:
 			continue
 	elif ( float( text_value ) < MIN_DBM ):
+		internet_connection = False
 		try:
 			log( text )
 			send_to_line( text )
@@ -117,6 +120,10 @@ while count < MAX_COUNT:
 		except:
 			continue
 	else:
+		if internet_connection == False:
+			send_to_line( 'Recovered' )
+			internet_connection = True
+
 		alert = 0
 
 	if ( alert == MAX_ALERT ):
@@ -127,4 +134,3 @@ while count < MAX_COUNT:
 	count += 1
 
 browser.close()
-
